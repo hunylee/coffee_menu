@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEGA COFFEE - Premium Kiosk</title>
+  <!-- Google Fonts: Outfit and Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="kiosk-container">
+    <!-- Header Area -->
+    <header class="kiosk-header">
+      <div class="logo-area">
+        <span class="brand-mega">MEGA</span>
+        <span class="brand-coffee">COFFEE</span>
+      </div>
+      <div class="header-right">
+        <!-- Dine-in / Take-out Toggle -->
+        <div class="order-type-toggle">
+          <button type="button" id="btn-dine-in" class="type-btn active" data-type="dine-in">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 22v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            매장 식사
+          </button>
+          <button type="button" id="btn-take-out" class="type-btn" data-type="take-out">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            포장 하기
+          </button>
+        </div>
+        <div class="kiosk-time" id="current-time">19:05</div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="kiosk-main">
+      <!-- Left side: Category & Menu Grid -->
+      <section class="menu-section">
+        <div class="category-tabs">
+          <button class="category-tab active">전체 메뉴</button>
+          <button class="category-tab">추천 메뉴</button>
+          <button class="category-tab">커피 (Coffee)</button>
+          <button class="category-tab">디카페인</button>
+        </div>
+        
+        <div class="menu-grid" id="menu-grid">
+          <!-- Dynamically populated by JS -->
+        </div>
+      </section>
+
+      <!-- Right side: Cart Sidebar -->
+      <aside class="cart-sidebar">
+        <div class="cart-header">
+          <h2>선택한 메뉴</h2>
+          <span class="cart-count" id="cart-count">0</span>
+        </div>
+
+        <div class="cart-items" id="cart-items">
+          <!-- Empty cart state by default -->
+          <div class="empty-cart-state" id="empty-cart">
+            <svg class="icon empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+            <p>장바구니가 비어 있습니다.</p>
+            <span>원하는 메뉴를 선택해 주세요.</span>
+          </div>
+        </div>
+
+        <div class="cart-footer">
+          <div class="cart-total-row">
+            <span class="total-label">총 주문금액</span>
+            <span class="total-price" id="cart-total">₩0</span>
+          </div>
+          <button type="button" class="checkout-btn" id="btn-checkout" disabled>
+            주문하기
+          </button>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Modal 1: Option Customize Dialog -->
+  <dialog id="option-dialog" class="kiosk-dialog">
+    <div class="dialog-content">
+      <button class="close-dialog-btn" id="btn-close-option" aria-label="닫기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="option-modal-body">
+        <div class="product-preview">
+          <img src="" alt="" id="modal-product-img">
+          <div class="product-info">
+            <h3 id="modal-product-name">메뉴 이름</h3>
+            <p id="modal-product-desc">메뉴 설명이 들어가는 자리입니다.</p>
+            <span class="base-price" id="modal-base-price">₩0</span>
+          </div>
+        </div>
+
+        <div class="options-container">
+          <!-- 1. Hot & Ice Selection -->
+          <div class="option-group">
+            <label class="option-label">온도 선택</label>
+            <div class="segmented-control" id="opt-temp">
+              <button type="button" class="segment-btn active" data-value="hot">HOT (뜨겁게)</button>
+              <button type="button" class="segment-btn" data-value="ice">ICE (차갑게)</button>
+            </div>
+          </div>
+
+          <!-- 2. Shot Addition -->
+          <div class="option-group">
+            <label class="option-label">샷 추가 (최대 3샷)</label>
+            <div class="segmented-control" id="opt-shots">
+              <button type="button" class="segment-btn active" data-value="0" data-price="0">기본</button>
+              <button type="button" class="segment-btn" data-value="1" data-price="500">+1 샷 (+₩500)</button>
+              <button type="button" class="segment-btn" data-value="2" data-price="1000">+2 샷 (+₩1,000)</button>
+              <button type="button" class="segment-btn" data-value="3" data-price="1500">+3 샷 (+₩1,500)</button>
+            </div>
+          </div>
+
+          <!-- 3. Ice & Water levels -->
+          <div class="option-group">
+            <label class="option-label" id="water-ice-label">얼음 / 물 양</label>
+            <div class="segmented-control" id="opt-water-ice">
+              <button type="button" class="segment-btn" data-value="less">적게</button>
+              <button type="button" class="segment-btn active" data-value="normal">보통</button>
+              <button type="button" class="segment-btn" data-value="more">많이</button>
+            </div>
+          </div>
+
+          <!-- 4. Syrup Options -->
+          <div class="option-group">
+            <label class="option-label">시럽 추가</label>
+            <div class="segmented-control" id="opt-syrup">
+              <button type="button" class="segment-btn active" data-value="no" data-price="0">시럽 제외</button>
+              <button type="button" class="segment-btn" data-value="yes" data-price="500">시럽 추가 (+₩500)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <div class="quantity-selector">
+          <button type="button" class="qty-btn" id="btn-qty-minus">—</button>
+          <span class="qty-number" id="modal-qty">1</span>
+          <button type="button" class="qty-btn" id="btn-qty-plus">+</button>
+        </div>
+        <button type="button" class="add-to-cart-btn" id="btn-add-to-cart">
+          <span id="modal-total-price">₩0</span> 담기
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Modal 2: Checkout & Payment Dialog -->
+  <dialog id="checkout-dialog" class="kiosk-dialog checkout-dialog">
+    <div class="dialog-content checkout-content">
+      <!-- Normal Checkout View -->
+      <div id="checkout-step-pay" class="checkout-view active">
+        <button class="close-dialog-btn" id="btn-close-checkout" aria-label="닫기">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        
+        <h3 class="checkout-title">결제하기</h3>
+        
+        <div class="order-summary-box">
+          <h4>주문 내역 요약 (<span id="checkout-order-type">매장 식사</span>)</h4>
+          <div class="summary-items" id="checkout-summary-items">
+            <!-- Populated dynamically -->
+          </div>
+          <div class="summary-total">
+            <span>최종 결제 금액</span>
+            <span id="checkout-total-price">₩0</span>
+          </div>
+        </div>
+
+        <div class="payment-methods">
+          <label class="option-label">결제 수단 선택</label>
+          <div class="payment-grid">
+            <button class="pay-method-btn active" data-method="card">
+              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+              <span>신용카드</span>
+            </button>
+            <button class="pay-method-btn" data-method="applepay">
+              <svg class="pay-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.2.67-2.92 1.51-.62.73-1.16 1.87-1.01 2.98 1.12.09 2.26-.59 2.94-1.43z"/>
+              </svg>
+              <span>Apple Pay</span>
+            </button>
+            <button class="pay-method-btn" data-method="kakaopay">
+              <span class="kakao-text-logo">kakao</span>
+              <span>카카오페이</span>
+            </button>
+            <button class="pay-method-btn" data-method="samsungpay">
+              <span class="samsung-text-logo">SAMSUNG</span>
+              <span>삼성페이</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="button" class="pay-submit-btn" id="btn-pay-submit">
+          결제 진행하기
+        </button>
+      </div>
+
+      <!-- Payment Processing View -->
+      <div id="checkout-step-processing" class="checkout-view">
+        <div class="processing-box">
+          <div class="spinner-container">
+            <svg class="coffee-cup-spinner" viewBox="0 0 100 100">
+              <path class="cup" d="M30,40 h40 v20 a20,20 0 0,1 -20,20 a20,20 0 0,1 -20,-20 z" fill="none" stroke="#ffd200" stroke-width="4"/>
+              <path class="handle" d="M70,47 h8 a5,5 0 0,1 5,5 v6 a5,5 0 0,1 -5,5 h-8" fill="none" stroke="#ffd200" stroke-width="4"/>
+              <path class="steam steam-1" d="M40,30 Q45,20 40,10" fill="none" stroke="#ffd200" stroke-width="3" stroke-linecap="round"/>
+              <path class="steam steam-2" d="M50,32 Q55,22 50,12" fill="none" stroke="#ffd200" stroke-width="3" stroke-linecap="round"/>
+              <path class="steam steam-3" d="M60,30 Q65,20 60,10" fill="none" stroke="#ffd200" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>결제가 진행 중입니다</h3>
+          <p>카드를 꽂아두거나 스마트폰을 리더기에 대어주세요.</p>
+        </div>
+      </div>
+
+      <!-- Order Receipt View -->
+      <div id="checkout-step-success" class="checkout-view">
+        <div class="success-box">
+          <div class="success-icon-container">
+            <svg class="checkmark-icon" viewBox="0 0 52 52">
+              <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+              <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+          </div>
+          <h3>주문이 완료되었습니다!</h3>
+          <p class="order-number-text">주문 번호 : <span id="success-order-num">0042</span></p>
+          
+          <div class="receipt-box">
+            <div class="receipt-header">
+              <span>MEGA COFFEE 영수증</span>
+              <span id="receipt-date">2026-05-20 19:05</span>
+            </div>
+            <div class="receipt-divider"></div>
+            <div class="receipt-items" id="receipt-items-list">
+              <!-- Dynamically populated -->
+            </div>
+            <div class="receipt-divider"></div>
+            <div class="receipt-row font-bold">
+              <span>결제 총액</span>
+              <span id="receipt-total-price">₩0</span>
+            </div>
+            <div class="receipt-row font-sm text-dim">
+              <span>결제수단</span>
+              <span id="receipt-payment-method">신용카드</span>
+            </div>
+          </div>
+          
+          <button type="button" class="success-close-btn" id="btn-success-close">
+            처음 화면으로 (5초 후 자동 이동)
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
